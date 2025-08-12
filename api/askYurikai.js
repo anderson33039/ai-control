@@ -1,6 +1,16 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
+  // Allow requests from your frontend origin (for dev: localhost)
+  res.setHeader('Access-Control-Allow-Origin', 'ai-yurikai.web.app');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    // Respond OK to OPTIONS preflight requests
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
@@ -9,9 +19,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing 'message' in request body" });
     }
 
-    // Example: calling Gemini API (replace with your API)
     const apiKey = process.env.GEMINI_API_KEY;
-    const response = await fetch("https://api.gemini.example/ask", {
+    const response = await fetch("https://ai-control-five.vercel.app/api/askYurikai", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -21,8 +30,7 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    res.status(200).json(data);
-
+    res.status(200).json({ reply: data.reply || data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
