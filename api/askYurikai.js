@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // CORS setup
   const allowedOrigins = ['https://ai-yurikai.web.app', 'http://localhost:5500'];
   const origin = req.headers.origin;
 
@@ -18,7 +19,7 @@ export default async function handler(req, res) {
 
   try {
     const { conversation } = req.body;
-    if (!conversation || !Array.isArray(conversation) || conversation.length === 0) {
+    if (!conversation || !Array.isArray(conversation)) {
       return res.status(400).json({ error: "Missing or invalid 'conversation' in request body" });
     }
 
@@ -35,7 +36,9 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
         "X-goog-api-key": apiKey
       },
-      body: JSON.stringify({ contents: conversation })
+      body: JSON.stringify({
+        contents: conversation
+      }),
     });
 
     if (!apiResponse.ok) {
