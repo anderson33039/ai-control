@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
     // Example: calling Gemini API (replace with your API)
     const apiKey = process.env.GEMINI_API_KEY;
-    const response = await fetch("https://api.gemini.example/ask", {
+    const response = await fetch("https://ai-control-kappa.vercel.app/api/askYurikai", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -27,3 +27,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
