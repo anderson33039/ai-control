@@ -1,4 +1,20 @@
 export default async function handler(req, res) {
+  // Allowed origins for CORS
+  const allowedOrigins = ['https://ai-yurikai.web.app', 'http://localhost:5500'];
+  const origin = req.headers.origin;
+
+  // Set CORS headers if origin is allowed
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
@@ -38,7 +54,6 @@ export default async function handler(req, res) {
 
     const data = await apiResponse.json();
 
-    // Navigate the response to get the generated text
     const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!replyText) {
