@@ -17,17 +17,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message } = req.body;
-    if (!message) {
-      return res.status(400).json({ error: "Missing 'message' in request body" });
+    const { contents } = req.body;
+    if (!contents) {
+      return res.status(400).json({ error: "Missing 'contents' in request body" });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: message }] }] }),
+      body: JSON.stringify({ contents }),
     });
 
     const data = await response.json();
