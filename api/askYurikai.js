@@ -1,28 +1,25 @@
 export default async function handler(req, res) {
-  // Allowed origins for CORS
   const allowedOrigins = ['https://ai-yurikai.web.app', 'http://localhost:5500'];
   const origin = req.headers.origin;
 
-  // Set CORS headers if origin is allowed
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
-    const { message } = req.body;
-    if (!message) {
-      return res.status(400).json({ error: "Missing 'message' in request body" });
+    const { conversation } = req.body;
+    if (!conversation || !Array.isArray(conversation) || conversation.length === 0) {
+      return res.status(400).json({ error: "Missing or invalid 'conversation' in request body" });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -38,13 +35,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
         "X-goog-api-key": apiKey
       },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: message }]
-          }
-        ]
-      })
+      body: JSON.stringify({ contents: conversation })
     });
 
     if (!apiResponse.ok) {
