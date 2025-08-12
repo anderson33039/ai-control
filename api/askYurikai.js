@@ -4,16 +4,11 @@ export default async function handler(req, res) {
 
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    // Optionally, block or don't set header for unrecognized origins
-    // return res.status(403).json({ error: 'Origin not allowed' });
   }
-
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    // Respond immediately to OPTIONS preflight with status 204 No Content
     return res.status(204).end();
   }
 
