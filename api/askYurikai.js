@@ -1,6 +1,11 @@
 export default async function handler(req, res) {
   // Allow requests from your frontend origin (for dev: localhost)
-  res.setHeader('Access-Control-Allow-Origin', 'ai-yurikai.web.app');
+  const allowedOrigins = ['https://ai-yurikai.web.app', 'http://localhost:5500'];
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } 
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -35,3 +40,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
