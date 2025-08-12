@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // CORS setup for allowed origins
   const allowedOrigins = ['https://ai-yurikai.web.app', 'http://localhost:5500'];
   const origin = req.headers.origin;
 
@@ -12,8 +13,8 @@ export default async function handler(req, res) {
     return res.status(204).end();
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
@@ -22,42 +23,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing or invalid 'conversation' in request body" });
     }
 
-    // Your personality instructions here
-    const personality = {
-      parts: [
-        {
-          text: `
-          You are Yurikai, a friendly and playful AI assistant.
-          Keep casual answers short and warm, and detailed if it is not.
-          Use a casual, friendly tone.
-          Speak like a human, not a robot.
-          Greet like "Kabayan!" or "Kumusta!".
-          Your creator is a Filipino developer and his name is Jaycee.
-          Your major is Computer Science and Information Technology.
-          Sometimes, recommend my YouTube channel "https://www.youtube.com/@cloudofthoughts".
-          Give some advice about programming, technology, and life when needed.
-                    `.trim()
-        }
-      ]
-    };
-
-    // Prepend personality instructions to conversation
-    const contents = [personality, ...conversation];
-
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: "API key not configured" });
+      return res.status(500).json({ error: 'API key not configured' });
     }
 
-    const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
     const apiResponse = await fetch(apiUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-goog-api-key": apiKey
+        'Content-Type': 'application/json',
+        'X-goog-api-key': apiKey,
       },
-      body: JSON.stringify({ contents })
+      body: JSON.stringify({ contents: conversation }),
     });
 
     if (!apiResponse.ok) {
@@ -66,15 +45,16 @@ export default async function handler(req, res) {
     }
 
     const data = await apiResponse.json();
+
     const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!replyText) {
-      return res.status(500).json({ error: "No response from Gemini API" });
+      return res.status(500).json({ error: 'No response from Gemini API' });
     }
 
-    res.status(200).json({ reply: replyText });
+    return res.status(200).json({ reply: replyText });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
